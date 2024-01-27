@@ -1,19 +1,57 @@
 import React, { useRef, useState } from 'react'
 import Header from './Header'
 import { inputdata } from '../utils/validate';
+import { auth } from '../utils/firebase';
+import {createUserWithEmailAndPassword ,signInWithEmailAndPassword } from "firebase/auth";
 
 const Login = () => {
   const [isSignIn ,setSignIn]= useState(true) ;
   const [errormessage,seterrormessage]=useState(null) ;
-  const email= useRef(null) ;
-  const name=useRef(null) ;
-  const password=useRef(null) ;
+  let email= useRef(null) ;
+  let name=useRef(null) ;
+  let password=useRef(null) ;
    const inputData=()=>{
       seterrormessage(inputdata(email.current.value,password.current.value)) ;
+      if(errormessage) return ;
+
+      if(isSignIn===true)
+      {
+        signInWithEmailAndPassword(auth, email.current.value, password.current.value) 
+        .then((userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+          console.log(user) ;
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          seterrormessage(errorCode+'-'+errorMessage) ;
+          console.log(errorCode+'-'+errorMessage) ;
+        });
+      }
+      else 
+      {
+        createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
+           .then((userCredential) => {
+           // Signed up 
+           const user = userCredential.user;
+           console.log(user) ;
+           // ...
+           })
+        .  catch((error) => {
+           const errorCode = error.code;
+           const errorMessage = error.message;
+           seterrormessage(errorCode+'-'+errorMessage) ;
+           console.log(errorCode) ;
+           // ..
+            });
+      }
       
    }
-    const changetheme=()=>{
+    const Changetheme=()=>{
       setSignIn(!isSignIn);
+      seterrormessage() ;
     };
   return (
     <div >
@@ -37,8 +75,8 @@ const Login = () => {
            <a href='https://www.netflix.com/dz-en/LoginHelp' className="text-xs hover:underline"style={{float:"right",color:'#999'}}>Need help?</a>
          </div>
          <div className="mt-24" style={{width:"20rem"}}>
-          <p className="cursor-pointer" style={{color:"#999"}} onClick={changetheme}>
-           {isSignIn?"New to Netflix":"Already registered"} <span className="hover:underline" style={{color:"white"}}>{isSignIn?"Sign In Now":"Sign Up"}</span>
+          <p className="cursor-pointer" style={{color:"#999"}} onClick={Changetheme}>
+           {isSignIn?"New to Netflix":"Already registered"} <span className="hover:underline" style={{color:"white"}}>{isSignIn?"Sign Up":"Sign In Now"}</span>
           </p>
          </div>
          <div className='text-xs'style={{width:"20rem"}}>

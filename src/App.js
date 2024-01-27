@@ -1,9 +1,13 @@
 import Body from './MyComponent/Body';
+import { Provider } from 'react-redux';
+import userstore from './utils/userstore';
 
 function App() {
   return (
     <div >
-      <Body/>
+      <Provider store={userstore}>
+        <Body/>
+      </Provider>
     </div>
   );
 }
