@@ -4,12 +4,15 @@ import Login from './Login'
 import Browse from './Browse'
 
 const Body = () => {
+   
+  
+
   return (
     <div>
       <BrowserRouter>
        <Routes>
         <Route path="/" element={<Login/>}/>
-        <Route path="/browse" element={<Browse/>} />
+        <Route path="/Browse" element={<Browse/>} />
         </Routes>
       </BrowserRouter>
     </div>

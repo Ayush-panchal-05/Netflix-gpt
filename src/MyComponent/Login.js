@@ -2,9 +2,15 @@ import React, { useRef, useState } from 'react'
 import Header from './Header'
 import { inputdata } from '../utils/validate';
 import { auth } from '../utils/firebase';
-import {createUserWithEmailAndPassword ,signInWithEmailAndPassword } from "firebase/auth";
+import {createUserWithEmailAndPassword ,signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { useNavigate } from 'react-router-dom';
+import Browse from './Browse' ;
+import { useDispatch } from 'react-redux';
+import { addUser } from '../utils/userSlice';
 
 const Login = () => {
+  const navigate = useNavigate() ;
+  const dispatch =useDispatch() ;
   const [isSignIn ,setSignIn]= useState(true) ;
   const [errormessage,seterrormessage]=useState(null) ;
   let email= useRef(null) ;
@@ -17,35 +23,37 @@ const Login = () => {
       if(isSignIn===true)
       {
         signInWithEmailAndPassword(auth, email.current.value, password.current.value) 
-        .then((userCredential) => {
-          // Signed in 
+        .then((userCredential) => { 
           const user = userCredential.user;
-          console.log(user) ;
-          // ...
+            // navigate("/Browse") ;
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
           seterrormessage(errorCode+'-'+errorMessage) ;
-          console.log(errorCode+'-'+errorMessage) ;
         });
       }
       else 
       {
         createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
-           .then((userCredential) => {
-           // Signed up 
+           .then((userCredential) => { 
            const user = userCredential.user;
-           console.log(user) ;
-           // ...
+               updateProfile(user ,{
+                displayName: name.current.value, photoURL:"https://avatars.githubusercontent.com/u/110166848?v=4",
+              }).then(() => {
+                const {uid,email,displayName,photoURL} = auth.currentUser;
+                dispatch(addUser({uid:uid,email:email,displayName:displayName,photoURL:photoURL})) ;   
+      
+               // navigate("/Browse") ;
+              }).catch((error) => {
+                seterrormessage(error) ;
+              });
            })
         .  catch((error) => {
            const errorCode = error.code;
            const errorMessage = error.message;
            seterrormessage(errorCode+'-'+errorMessage) ;
-           console.log(errorCode) ;
-           // ..
-            });
+          });
       }
       
    }
@@ -89,5 +97,5 @@ const Login = () => {
     </div>
   )
 }
-
+ 
 export default Login
